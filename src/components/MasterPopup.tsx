@@ -8,7 +8,7 @@ import { FileUpload } from './FileUpload';
 import confetti from 'canvas-confetti';
 
 // Google Apps Script URL
-const GAS_DEPLOYMENT_URL = 'https://script.google.com/macros/s/AKfycbz2eB8mp8FjVqZUyDX3IvZSxw4X7p7YdvZne42JTOSpkGXSWAjW-SOQPabrl7jV3MC9/exec';
+const GAS_DEPLOYMENT_URL = 'https://script.google.com/macros/s/AKfycbzYH-TfT_uR-2uxR8G2my7KElsR_x0f9GekGO35oSqq-qXkjI8k1zPSRvbIrATJDCg/exec';
 
 // Mock booked slots
 const BOOKED_SLOTS = [
@@ -368,9 +368,10 @@ export function MasterPopup() {
 
     // Prepare data for Google Apps Script (Step 1 - Lead)
     const formDataPayload = {
+      formType: 'master',
       fullName: formData.name,
       email: formData.email,
-      phone: `${selectedCountry.code} ${formData.phone}`,
+      phone: `${selectedCountry.code.replace('+', '')} ${formData.phone}`, // Remove + to avoid sheet formula issues
       country: selectedCountry.name,
       budget: formData.budget,
       description: formData.overview,
@@ -401,9 +402,10 @@ export function MasterPopup() {
 
     // Prepare data for Google Apps Script (Step 4 - Booking Confirmed)
     const formDataPayload = {
+      formType: 'master',
       fullName: formData.name,
       email: formData.email,
-      phone: `${selectedCountry.code} ${formData.phone}`,
+      phone: `${selectedCountry.code.replace('+', '')} ${formData.phone}`, // Remove + to avoid sheet formula issues
       country: selectedCountry.name,
       budget: formData.budget,
       description: formData.overview,

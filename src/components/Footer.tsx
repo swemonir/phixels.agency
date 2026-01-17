@@ -3,31 +3,84 @@ import { Link } from 'react-router-dom';
 import { Linkedin, MessageCircle, Mail, ArrowRight, ChevronDown, Facebook, CheckCircle, X } from 'lucide-react';
 import { Button } from './ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Google Apps Script URL
+const GAS_DEPLOYMENT_URL = 'https://script.google.com/macros/s/AKfycbzYH-TfT_uR-2uxR8G2my7KElsR_x0f9GekGO35oSqq-qXkjI8k1zPSRvbIrATJDCg/exec';
+
+// Helper to submit data to Google Apps Script
+const submitData = async (data: any) => {
+  try {
+    const response = await fetch(GAS_DEPLOYMENT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    return { success: false, error };
+  }
+};
 export function Footer() {
   const [worksDropdownOpen, setWorksDropdownOpen] = useState(false);
   const [email, setEmail] = useState('');
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [modalType, setModalType] = useState<'success' | 'error' | null>(null);
+  const GAS_DEPLOYMENT_URL = 'https://script.google.com/macros/s/AKfycbzYH-TfT_uR-2uxR8G2my7KElsR_x0f9GekGO35oSqq-qXkjI8k1zPSRvbIrATJDCg/exec';
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle newsletter subscription
-    console.log('Newsletter subscription:', email);
-    setShowSuccessModal(true);
-    setEmail('');
-    // Auto close modal after 3 seconds
-    setTimeout(() => {
-      setShowSuccessModal(false);
-    }, 3000);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
+      setModalType('error');
+      setTimeout(() => setModalType(null), 3000);
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch(GAS_DEPLOYMENT_URL, {
+        method: 'POST',
+        body: new URLSearchParams({
+          formType: 'newsletter',
+          email: email
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setModalType('success');
+        setEmail('');
+      } else {
+        setError(data.error || 'Something went wrong.');
+        setModalType('error');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+      setModalType('error');
+    } finally {
+      setLoading(false);
+    }
+    setTimeout(() => setModalType(null), 3000);
   };
   return <footer className="bg-black border-t border-white/10 pt-24 pb-12 relative overflow-hidden">
       {/* Success Modal */}
       <AnimatePresence>
-        {showSuccessModal && <motion.div initial={{
+        {modalType && <motion.div initial={{
         opacity: 0
       }} animate={{
         opacity: 1
       }} exit={{
         opacity: 0
-      }} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowSuccessModal(false)}>
+      }} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setModalType(null)}>
             <motion.div initial={{
           scale: 0.9,
           y: 20
@@ -38,18 +91,30 @@ export function Footer() {
           scale: 0.9,
           y: 20
         }} onClick={e => e.stopPropagation()} className="bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 max-w-md w-full text-center relative">
-              <button onClick={() => setShowSuccessModal(false)} className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors">
+              <button onClick={() => setModalType(null)} className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors">
                 <X size={20} className="text-gray-400" />
               </button>
 
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[color:var(--vibrant-green)]/20 flex items-center justify-center">
-                <CheckCircle className="w-8 h-8 text-[color:var(--vibrant-green)]" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Thank You!</h3>
-              <p className="text-gray-400">
-                You've successfully subscribed to our newsletter. Stay tuned for
-                the latest updates!
-              </p>
+              {modalType === 'success' ? (
+                <>
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[color:var(--vibrant-green)]/20 flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-[color:var(--vibrant-green)]" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Thank You!</h3>
+                  <p className="text-gray-400">
+                    You've successfully subscribed to our newsletter. Stay tuned for
+                    the latest updates!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
+                    <X size={32} className="text-red-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Error</h3>
+                  <p className="text-gray-400">{error}</p>
+                </>
+              )}
             </motion.div>
           </motion.div>}
       </AnimatePresence>
@@ -216,8 +281,8 @@ export function Footer() {
               </p>
               <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email" className="flex-1 bg-black border border-white/20 rounded-lg px-4 py-2 text-white text-sm focus:border-[color:var(--bright-red)] outline-none" required />
-                <button type="submit" className="bg-white text-black font-bold px-4 py-2 rounded-lg text-sm hover:bg-[color:var(--bright-red)] hover:text-white transition-colors">
-                  Join
+                <button type="submit" disabled={loading} className="bg-white text-black font-bold px-4 py-2 rounded-lg text-sm hover:bg-[color:var(--bright-red)] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  {loading ? 'Joining...' : 'Join'}
                 </button>
               </form>
             </div>

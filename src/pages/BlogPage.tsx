@@ -20,21 +20,47 @@ export function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterError, setNewsletterError] = useState('');
   const categories = ['All', 'Mobile', 'AI', 'Web3', 'Backend', 'Design', 'DevOps'];
   const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) || post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Newsletter subscription:', newsletterEmail);
-    setShowSuccessModal(true);
-    setNewsletterEmail('');
-    // Auto close modal after 3 seconds
-    setTimeout(() => {
-      setShowSuccessModal(false);
-    }, 3000);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newsletterEmail)) {
+      setNewsletterError('Please enter a valid email address.');
+      return;
+    }
+    setNewsletterLoading(true);
+    setNewsletterError('');
+    try {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbzYH-TfT_uR-2uxR8G2my7KElsR_x0f9GekGO35oSqq-qXkjI8k1zPSRvbIrATJDCg/exec', {
+        method: 'POST',
+        body: new URLSearchParams({
+          formType: 'newsletter',
+          email: newsletterEmail
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setShowSuccessModal(true);
+        setNewsletterEmail('');
+        // Auto close modal after 3 seconds
+        setTimeout(() => {
+          setShowSuccessModal(false);
+        }, 3000);
+      } else {
+        setNewsletterError(data.error || 'Something went wrong.');
+      }
+    } catch (error) {
+      setNewsletterError('Network error. Please try again.');
+    } finally {
+      setNewsletterLoading(false);
+    }
   };
   return <main className="bg-[#050505] min-h-screen pt-44 pb-20">
       {/* Success Modal */}
@@ -160,8 +186,9 @@ export function BlogPage() {
               </p>
               <form onSubmit={handleNewsletterSubmit}>
                 <input type="email" value={newsletterEmail} onChange={e => setNewsletterEmail(e.target.value)} placeholder="Enter your email" className="w-full bg-black/50 border border-white/20 rounded-lg px-4 py-2 text-white mb-2 focus:outline-none focus:border-[color:var(--bright-red)]" required />
-                <Button type="submit" className="w-full" variant="primary">
-                  Subscribe
+                {newsletterError && <p className="text-red-400 text-sm mb-2">{newsletterError}</p>}
+                <Button type="submit" className="w-full" variant="primary" disabled={newsletterLoading}>
+                  {newsletterLoading ? 'Subscribing...' : 'Subscribe'}
                 </Button>
               </form>
             </div>
