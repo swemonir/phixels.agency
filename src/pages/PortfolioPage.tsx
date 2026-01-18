@@ -201,7 +201,7 @@ export function PortfolioPage() {
               {/* Content */}
             
 
-              <div className="w-full md:w-[55%] space-y-6 h-full relative">
+              <div className="w-full md:w-[55%] space-y-6">
                 <h2 className="text-4xl md:text-5xl font-bold text-white group-hover:text-[color:var(--bright-red)] transition-colors">
                   {project.title}
                 </h2>
@@ -219,7 +219,7 @@ export function PortfolioPage() {
                       {tech}
                     </span>)}
                 </div>
-                <div className="flex items-center gap-8 pt-4 absolute -bottom-36 w-full">
+                <div className="flex items-center gap-8 pt-8">
                   <div>
                     <div className="text-3xl font-bold text-white">
                       {project.stats}
