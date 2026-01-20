@@ -681,7 +681,7 @@ export function MasterPopup() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-xs text-gray-400">Work Email *</label>
                       <input
