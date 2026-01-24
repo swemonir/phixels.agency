@@ -61,7 +61,7 @@ export function Hero() {
             duration: 0.8,
           }}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-[color:var(--neon-yellow)] mb-6">
+          <div className="inline-flex items-center gap-2 px-3 mt-20 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-[color:var(--neon-yellow)] mb-6">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
@@ -133,21 +133,6 @@ export function Hero() {
           </div>
         </motion.div>
       </div>
-
-      <motion.div
-        animate={{
-          y: [0, 10, 0],
-        }}
-        transition={{
-          repeat: Infinity,
-          duration: 2,
-        }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-500 hidden md:block lg:block"
-      >
-        <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center p-1">
-          <div className="w-1 h-2 bg-white rounded-full" />
-        </div>
-      </motion.div>
     </section>
   );
 }
