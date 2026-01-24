@@ -52,7 +52,7 @@ export function PortfolioPage() {
               }}
               className="group"
             >
-              <div className="bg-[#111111] p-4 sm:p-6 rounded-2xl border border-white/10 relative">
+              <div className="bg-[#111111] p-4 lg:flex lg:gap-6 sm:p-6 rounded-2xl border border-white/10 relative">
                 {/* Image */}
                 <div
                   className={`w-full aspect-video sm:aspect-[16/9] md:aspect-video rounded-2xl overflow-hidden relative mb-6 md:mb-0 ${index % 2 === 1 ? "md:order-2" : ""
