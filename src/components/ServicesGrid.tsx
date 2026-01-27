@@ -8,21 +8,6 @@ export function ServicesGrid() {
       <div className="absolute top-1/4 -left-64 w-96 h-96 bg-[color:var(--deep-navy)] rounded-full mix-blend-screen filter blur-[100px] opacity-20" />
       <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-[color:var(--deep-red)] rounded-full mix-blend-screen filter blur-[100px] opacity-10" />
     </div>
-    <motion.div
-      animate={{
-        y: [0, 10, 0],
-      }}
-      transition={{
-        repeat: Infinity,
-        duration: 2,
-      }}
-      className="absolute top-5 z-40 left-1/2 -translate-x-1/2 text-gray-500 hidden md:block lg:block"
-    >
-      <div className="w-6 h-10 border-2 z-40 border-white/20 rounded-full flex justify-center p-1">
-        <div className="w-1 h-2 bg-white rounded-full" />
-      </div>
-    </motion.div>
-
     <div className="container mx-auto px-4 relative z-10">
       <div className="text-center mb-16">
         <motion.div initial={{
