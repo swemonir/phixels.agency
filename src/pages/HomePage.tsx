@@ -8,9 +8,11 @@ import { BlogSection } from '../components/BlogSection';
 import { Button } from '../components/ui/Button';
 import { ProfessionalReviewCarousel } from '../components/ProfessionalReviewCarousel';
 import { ArrowRight } from 'lucide-react';
+import Mouse from '../components/ui/Mouse';
 export function HomePage() {
   return <main className="bg-[#050505] min-h-screen">
     <Hero />
+    <Mouse />
     <ServicesGrid />
     <ProcessSection />
     <PortfolioTeaser />
