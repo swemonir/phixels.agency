@@ -17,7 +17,9 @@ export function Footer() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
-  const [modalType, setModalType] = useState<"success" | null>(null);
+  const [modalType, setModalType] = useState<
+    "success" | "already-subscribed" | "error" | null
+  >(null);
 
   const GAS_DEPLOYMENT_URL =
     "https://script.google.com/macros/s/AKfycbzYH-TfT_uR-2uxR8G2my7KElsR_x0f9GekGO35oSqq-qXkjI8k1zPSRvbIrATJDCg/exec";
@@ -61,8 +63,9 @@ export function Footer() {
         text.includes("already_subscribed") ||
         text.toLowerCase().includes("already")
       ) {
-        setError("This email is already subscribed. Please try another one.");
-        setSubmitting(false);
+        setModalType("already-subscribed");
+        setSubmitted(true);
+        setEmail("");
         return;
       }
 
@@ -70,13 +73,10 @@ export function Footer() {
       setSubmitted(true);
       setEmail("");
     } catch (err) {
-      setModalType("success");
-      setSubmitted(true);
-      setEmail("");
+      console.error("Newsletter submission error:", err);
+      setModalType("error");
     } finally {
-      if (!error) {
-        setSubmitting(false);
-      }
+      setSubmitting(false);
     }
   };
 
@@ -84,7 +84,7 @@ export function Footer() {
     <footer className="bg-black border-t border-white/10 pt-24 pb-12 relative overflow-hidden">
       {/* Success Modal (শুধুমাত্র সাকসেস হলে আসবে) */}
       <AnimatePresence>
-        {modalType === "success" && (
+        {modalType && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -106,13 +106,36 @@ export function Footer() {
                 <X size={20} className="text-gray-400" />
               </button>
 
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[color:var(--vibrant-green)]/20 flex items-center justify-center">
-                <CheckCircle className="w-8 h-8 text-[color:var(--vibrant-green)]" />
+              <div
+                className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${modalType === "success"
+                  ? "bg-[color:var(--vibrant-green)]/20"
+                  : modalType === "already-subscribed"
+                    ? "bg-[color:var(--neon-yellow)]/20"
+                    : "bg-red-500/20"
+                  }`}
+              >
+                {modalType === "success" ? (
+                  <CheckCircle className="w-8 h-8 text-[color:var(--vibrant-green)]" />
+                ) : modalType === "already-subscribed" ? (
+                  <AlertCircle className="w-8 h-8 text-[color:var(--neon-yellow)]" />
+                ) : (
+                  <X className="w-8 h-8 text-red-500" />
+                )}
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Thank You!</h3>
+
+              <h3 className="text-2xl font-bold text-white mb-2">
+                {modalType === "success"
+                  ? "Thank You!"
+                  : modalType === "already-subscribed"
+                    ? "Already Subscribed"
+                    : "Something Went Wrong"}
+              </h3>
               <p className="text-gray-400">
-                You've successfully subscribed to our newsletter. Stay tuned for
-                the latest updates!
+                {modalType === "success"
+                  ? "You've successfully subscribed to our newsletter. Stay tuned for the latest updates!"
+                  : modalType === "already-subscribed"
+                    ? "This email is already on our list. You're already set to receive our updates!"
+                    : "We couldn't process your subscription right now. Please try again later."}
               </p>
               <button
                 onClick={() => setModalType(null)}
@@ -354,7 +377,7 @@ export function Footer() {
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
-                      setError(""); // টাইপ করার সময় এরর মুছে যাবে
+                      setError("");
                     }}
                     placeholder="Enter email"
                     className={`flex-1 bg-black border ${error ? "border-red-500/50" : "border-white/20"} rounded-lg px-3 sm:px-4 py-2 text-white text-xs sm:text-sm focus:border-[color:var(--bright-red)] outline-none transition-colors`}
